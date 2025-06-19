@@ -15,7 +15,14 @@ class UnitController extends Controller
     public function getData()
     {
         try {
-            $rawData = DB::connection('mysql_dbticket')->select("SELECT * FROM m_unit");
+            if (session('role') == "root") {
+                $rawData = DB::connection('mysql_dbticket')->select("SELECT * FROM m_unit");
+            } else {
+                // User biasa: filter berdasarkan mitraid
+                $data_mitraid = session('mitraid');
+                $rawData = DB::connection('mysql_dbticket')->select("SELECT * FROM m_unit WHERE mitraid = ?", [$data_mitraid]);
+            }
+
             $data = array_map(function ($item) {
                 return (array) $item;
             }, $rawData);
@@ -25,6 +32,7 @@ class UnitController extends Controller
             return response()->json(['error' => 'Gagal mengambil data: ' . $e->getMessage()], 500);
         }
     }
+
 
     public function store(Request $request)
     {

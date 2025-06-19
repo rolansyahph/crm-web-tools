@@ -19,16 +19,25 @@
                         @if(Session::has('nama_user')) {{ Session::get('nama_user') }} @endif
                         <i class="fa fa-angle-down ml-1"></i>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right" style="min-width: 150px;">
-                        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                    <div class="dropdown-menu dropdown-menu-right" style="min-width: 200px;">
+                        @if(Session::has('nama_user'))
+                            <div class="px-3 py-2 border-bottom small text-muted">
+                                <div><strong>User ID:</strong> {{ Session::get('userid') }}</div>
+                                <div><strong>Role:</strong> {{ Session::get('role') }}</div>
+                                @if (Session::get('role') != 'root')
+                                    <div><strong>Mitra ID:</strong> {{ Session::get('mitraid') }}</div>
+                                @endif
+                            </div>
+                        @endif
+
+                        <form action="{{ route('logout') }}" method="POST" class="w-100 px-3 py-1">
                             @csrf
-                            <button type="submit" class="dropdown-item" style="background: none; border: none; padding: 0; cursor: pointer;">
+                            <button type="submit" class="dropdown-item text-center text-danger">
                                 <i class="fa fa-sign-out-alt mr-2"></i> Log Out
                             </button>
                         </form>
                     </div>
                 </li>
-
             </ul>
         </div>
     </div>

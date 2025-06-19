@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -55,6 +56,7 @@ class UserController extends Controller
     // }
 
 
+    // FORM LOGIN & LOGOUT
     public function showLoginForm()
     {
         return view('login'); // tampilkan form login
@@ -77,6 +79,7 @@ class UserController extends Controller
                 'userid' => $user['userid'],
                 'nama_user' => $user['nama'],
                 'role' => $user['roleuser'],
+                'mitraid' => $user['mitraid'],
             ]);
             return redirect('/Dasboard-CRM')->with('sukses', 'User ditemukan');
         } else {
@@ -86,11 +89,15 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        $request->session()->flush();
+        Auth::logout(); 
+        $request->session()->invalidate(); 
+        $request->session()->regenerateToken();
         return redirect('/')->with('sukses', 'Logout berhasil');
     }
 
+    // END
 
+    // M USER
     public function index()
     {
         return view('master_data.m_users.index');
@@ -128,9 +135,9 @@ class UserController extends Controller
 
             $inputUser = session('userid');
 
-            DB::connection('mysql_dbticket')->insert(
-                "INSERT INTO m_user (userid, `password`, nama, roleuser, aktif, inputuser, inputtanggal) VALUES (?, ?, ?, ?, ?, ?, NOW())",
-                [$request->userid, $request->password, $request->nama, $request->roleuser, $request->aktif, $inputUser]
+           DB::connection('mysql_dbticket')->insert(
+                "INSERT INTO m_user (userid, `password`, nama, roleuser, aktif, mitraid, inputuser, inputtanggal) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+                [$request->userid, $request->password, $request->nama, $request->roleuser, $request->aktif, $request->mitraid, $inputUser]
             );
 
             return response()->json(['message' => 'User berhasil ditambahkan.']);
@@ -145,8 +152,8 @@ class UserController extends Controller
             $updateUser = session('userid');
 
             DB::connection('mysql_dbticket')->update(
-                "UPDATE m_user SET nama = ?, `password` = ?, roleuser = ?, aktif = ?, updateuser = ?, updatetanggal = NOW() WHERE userid = ?",
-                [$request->nama, $request->password, $request->roleuser, $request->aktif, $updateUser, $request->userid]
+                "UPDATE m_user SET nama = ?, `password` = ?, roleuser = ?, aktif = ?, mitraid = ?, updateuser = ?, updatetanggal = NOW() WHERE userid = ?",
+                [$request->nama, $request->password, $request->roleuser, $request->aktif, $request->mitraid, $updateUser, $request->userid]
             );
 
             return response()->json(['message' => 'User berhasil diupdate.']);
@@ -168,6 +175,9 @@ class UserController extends Controller
             return response()->json(['message' => 'Gagal hapus: ' . $e->getMessage()], 500);
         }
     }
+
+    // END
+
 
 
 }

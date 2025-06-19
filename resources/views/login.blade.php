@@ -41,7 +41,7 @@
                     @csrf
                     <div class="login-form-head">
                         <h4>Sign In CRM-WEB </h4>
-                        {{-- <p>Hello there, Sign in and start managing your Admin Template</p> --}}
+                        <p>PT. Layanan Imedia</p>
                         @if(session('error'))
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <strong>Gagal Login!</strong> {{ session('error') }}

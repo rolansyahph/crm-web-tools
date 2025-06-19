@@ -15,7 +15,13 @@ class BankController extends Controller
     public function getData()
     {
         try {
-            $rawData = DB::connection('mysql_dbticket')->select("SELECT * FROM m_bank");
+            if (session('role') == "root") {
+                $rawData = DB::connection('mysql_dbticket')->select("SELECT * FROM m_bank");
+            } else {
+                // User biasa: filter berdasarkan mitraid
+                $data_mitraid = session('mitraid');
+                $rawData = DB::connection('mysql_dbticket')->select("SELECT * FROM m_bank WHERE mitraid = ?", [$data_mitraid]);
+            }
             $data = array_map(function ($item) {
                 return (array) $item;
             }, $rawData);
@@ -30,18 +36,18 @@ class BankController extends Controller
     {
         try {
             $exists = DB::connection('mysql_dbticket')
-                ->selectOne("SELECT * FROM m_bank WHERE mitra_id = ? AND bank_id = ?", [$request->mitra_id, $request->bank_id]);
+                ->selectOne("SELECT * FROM m_bank WHERE mitraid = ? AND bank_id = ?", [$request->mitraid, $request->bank_id]);
 
             if ($exists) {
                 return response()->json(['message' => 'Data bank sudah ada!'], 400);
             }
 
-            $input_user = session('userid');
+
             DB::connection('mysql_dbticket')->insert(
-                "INSERT INTO m_bank (mitra_id, bank_id, bank_server, bank_client, nama, norek, gangguan_sts, gangguan_ket, input_user, input_tgl, lastupdate_user, lastupdate_tgl)
+                "INSERT INTO m_bank (mitraid, bank_id, bank_server, bank_client, nama, norek, gangguan_sts, gangguan_ket, input_user, input_tgl, lastupdate_user, lastupdate_tgl)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 [
-                    $request->mitra_id,
+                    $request->mitraid,
                     $request->bank_id,
                     $request->bank_server,
                     $request->bank_client,
@@ -49,7 +55,7 @@ class BankController extends Controller
                     $request->norek,
                     $request->gangguan_sts,
                     $request->gangguan_ket,
-                    $input_user,
+                    session('userid'),
                     now(),
                     $request->lastupdate_user,
                     now()
@@ -68,7 +74,7 @@ class BankController extends Controller
             $lastupdate_user = session('userid');
             DB::connection('mysql_dbticket')->update(
                 "UPDATE m_bank SET bank_server = ?, bank_client = ?, nama = ?, norek = ?, gangguan_sts = ?, gangguan_ket = ?, lastupdate_user = ?, lastupdate_tgl = ?
-                 WHERE mitra_id = ? AND bank_id = ?",
+                 WHERE mitraid = ? AND bank_id = ?",
                 [
                     $request->bank_server,
                     $request->bank_client,
@@ -78,7 +84,7 @@ class BankController extends Controller
                     $request->gangguan_ket,
                     $lastupdate_user,
                     now(),
-                    $request->mitra_id,
+                    $request->mitraid,
                     $request->bank_id
                 ]
             );
@@ -93,8 +99,8 @@ class BankController extends Controller
     {
         try {
             DB::connection('mysql_dbticket')->delete(
-                "DELETE FROM m_bank WHERE mitra_id = ? AND bank_id = ?",
-                [$request->mitra_id, $request->bank_id]
+                "DELETE FROM m_bank WHERE mitraid = ? AND bank_id = ?",
+                [$request->mitraid, $request->bank_id]
             );
 
             return response()->json(['message' => 'Data bank berhasil dihapus.']);

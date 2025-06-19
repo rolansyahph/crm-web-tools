@@ -7,7 +7,10 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="header-title">Data Unit</h4>
-                    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addUnitModal">Tambah Unit</button>
+                    {{-- <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addUnitModal">Tambah Unit</button> --}}
+                    @if (session('role') === 'root' || session('role') === 'admin')
+                        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addUnitModal">Tambah Unit</button>
+                    @endif
                     <div class="data-tables datatable-dark">
                         <table id="unitTable" class="table table-striped table-bordered nowrap" style="width:100%">
                             <thead class="text-capitalize">
@@ -17,7 +20,11 @@
                                     <th>Nama Unit</th>
                                     <th>No DB</th>
                                     <th>Key DB</th>
-                                    <th>Aksi</th>
+                                    @if (session('role') === 'user')
+                                        <th style="display: none;">Aksi</th>
+                                    @else
+                                        <th>Aksi</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -111,6 +118,10 @@ $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#mitraTable')) {
         $('#mitraTable').DataTable().clear().destroy();
     }
+
+    const userRole = "{{ session('role') }}";
+    const isUser = userRole === 'user';
+
     const table = $('#unitTable').DataTable({
         scrollX: true,
         responsive: true,
@@ -125,11 +136,25 @@ $(document).ready(function () {
             { data: "keydb", name: "keydb" },
             {
                 data: null,
+                // render: function (data) {
+                //     return `
+                //         <button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>
+                //         <button class="btn btn-sm btn-danger ml-1" onclick='deleteUnit("${data.mitraid}", "${data.kdunit}")'>Hapus</button>
+                //     `;
+                // }
+                visible: !isUser, // <-- disembunyikan jika role 'user'
                 render: function (data) {
-                    return `
-                        <button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>
-                        <button class="btn btn-sm btn-danger ml-1" onclick='deleteUnit("${data.mitraid}", "${data.kdunit}")'>Hapus</button>
-                    `;
+                    let buttons = '';
+
+                    if (userRole === 'root') {
+                        buttons += `<button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>`;
+                        buttons += `<button class="btn btn-sm btn-danger ml-1" onclick='deleteUnit("${data.mitraid}", "${data.kdunit}")'>Hapus</button>`;
+                    } else if (userRole === 'admin') {
+                        buttons += `<button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>`;
+                    }
+                    // Untuk user biasa tidak ditampilkan tombol apa-apa
+
+                    return buttons;
                 }
             }
         ]

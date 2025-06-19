@@ -8,7 +8,9 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="header-title">Data Mitra</h4>
-                    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addMitraModal">Tambah Mitra</button>
+                    @if (session('role') === 'root' || session('role') === 'admin')
+                        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addMitraModal">Tambah Mitra</button>
+                    @endif
                     <div class="data-tables datatable-dark">
                         <table id="mitraTable" class="table table-striped table-bordered nowrap" style="width:100%">
                             <thead class="text-capitalize">
@@ -22,7 +24,11 @@
                                     <th>Input Tanggal</th>
                                     <th>Update User</th>
                                     <th>Update Tanggal</th>
-                                    <th>Aksi</th>
+                                    @if (session('role') === 'user')
+                                        <th style="display: none;">Aksi</th>
+                                    @else
+                                        <th>Aksi</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -53,7 +59,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Alamat</label>
-                                <input type="text" name="alamat" class="form-control">
+                                <textarea name="alamat" class="form-control" rows="3"></textarea>
                             </div>
                             <div class="form-group">
                                 <label>Region</label>
@@ -93,7 +99,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Alamat</label>
-                                <input type="text" name="alamat" id="edit_alamat" class="form-control">
+                                <textarea name="alamat" id="edit_alamat" class="form-control"rows="3"></textarea>
                             </div>
                             <div class="form-group">
                                 <label>Region</label>
@@ -125,6 +131,10 @@ $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#mitraTable')) {
         $('#mitraTable').DataTable().clear().destroy();
     }
+
+    const userRole = "{{ session('role') }}";
+    const isUser = userRole === 'user';
+
     const table = $('#mitraTable').DataTable({
         scrollX: true,
         responsive: true,
@@ -143,11 +153,19 @@ $(document).ready(function () {
             { data: "updatetanggal", name: "updatetanggal" },
             {
                 data: null,
+                visible: !isUser, // <-- disembunyikan jika role 'user'
                 render: function (data) {
-                    return `
-                        <button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>
-                        <button class="btn btn-sm btn-danger ml-1" onclick='deleteMitra("${data.mitraid}")'>Hapus</button>
-                    `;
+                    let buttons = '';
+
+                    if (userRole === 'root') {
+                        buttons += `<button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>`;
+                        buttons += `<button class="btn btn-sm btn-danger ml-1" onclick='deleteMitra("${data.mitraid}")'>Hapus</button>`;
+                    } else if (userRole === 'admin') {
+                        buttons += `<button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>`;
+                    }
+                    // Untuk user biasa tidak ditampilkan tombol apa-apa
+
+                    return buttons;
                 }
             }
         ]

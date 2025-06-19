@@ -7,7 +7,9 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="header-title">Data Bank</h4>
-                    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addBankModal">Tambah Bank</button>
+                    @if (session('role') === 'root' || session('role') === 'admin')
+                        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addBankModal">Tambah Bank</button>
+                    @endif
                     <div class="data-tables datatable-dark">
                         <table id="bankTable" class="table table-striped table-bordered nowrap" style="width:100%">
                             <thead class="text-capitalize">
@@ -24,7 +26,11 @@
                                     <th>Input Tgl</th>
                                     <th>Update User</th>
                                     <th>Update Tgl</th>
-                                    <th>Aksi</th>
+                                    @if (session('role') === 'user')
+                                        <th style="display: none;">Aksi</th>
+                                    @else
+                                        <th>Aksi</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -46,13 +52,17 @@
                         </div>
                         <div class="modal-body">
                             @foreach ([
-                                'mitra_id', 'bank_id', 'bank_server', 'bank_client',
+                                'mitraid', 'bank_id', 'bank_server', 'bank_client',
                                 'nama', 'norek', 'gangguan_sts', 'gangguan_ket'
                             ] as $field)
                                 <div class="form-group">
                                     <label>{{ ucwords(str_replace('_', ' ', $field)) }}</label>
-                                    <input type="{{ $field === 'gangguan_sts' ? 'number' : 'text' }}"
-                                           name="{{ $field }}" class="form-control" required>
+                                    @if ($field === 'gangguan_ket')
+                                        <textarea name="{{ $field }}" class="form-control" rows="3" required></textarea>
+                                    @else
+                                        <input type="{{ $field === 'gangguan_sts' ? 'number' : 'text' }}"
+                                            name="{{ $field }}" class="form-control" required>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
@@ -75,16 +85,20 @@
                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="mitra_id" id="edit_mitra_id">
+                            <input type="hidden" name="mitraid" id="edit_mitraid">
                             <input type="hidden" name="bank_id" id="edit_bank_id">
-                            @foreach ([
+                           @foreach ([
                                 'bank_server', 'bank_client', 'nama', 'norek',
                                 'gangguan_sts', 'gangguan_ket'
-                            ] as $field)
+                            ] as $field)`
                                 <div class="form-group">
                                     <label>{{ ucwords(str_replace('_', ' ', $field)) }}</label>
-                                    <input type="{{ $field === 'gangguan_sts' ? 'number' : 'text' }}"
-                                           name="{{ $field }}" id="edit_{{ $field }}" class="form-control" required>
+                                    @if ($field === 'gangguan_ket')
+                                        <textarea name="{{ $field }}" id="edit_{{ $field }}" class="form-control" rows="3" required></textarea>
+                                    @else
+                                        <input type="{{ $field === 'gangguan_sts' ? 'number' : 'text' }}"
+                                            name="{{ $field }}" id="edit_{{ $field }}" class="form-control" required>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
@@ -106,13 +120,17 @@ $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#mitraTable')) {
         $('#mitraTable').DataTable().clear().destroy();
     }
+
+    const userRole = "{{ session('role') }}";
+    const isUser = userRole === 'user';
+
     const table = $('#bankTable').DataTable({
         scrollX: true,
         responsive: true,
         processing: true,
         ajax: "{{ route('m_bank.data') }}",
         columns: [
-            { data: 'mitra_id' },
+            { data: 'mitraid' },
             { data: 'bank_id' },
             { data: 'bank_server' },
             { data: 'bank_client' },
@@ -126,9 +144,19 @@ $(document).ready(function () {
             { data: 'lastupdate_tgl' },
             {
                 data: null,
+                visible: !isUser, // <-- disembunyikan jika role 'user'
                 render: function (data) {
-                    return `<button class="btn btn-sm btn-warning" onclick='editBank(${JSON.stringify(data)})'>Edit</button>
-                            <button class="btn btn-sm btn-danger ml-1" onclick='deleteBank("${data.mitra_id}", "${data.bank_id}")'>Hapus</button>`;
+                    let buttons = '';
+
+                    if (userRole === 'root') {
+                        buttons += `<button class="btn btn-sm btn-warning" onclick='editBank(${JSON.stringify(data)})'>Edit</button>`;
+                        buttons += `<button class="btn btn-sm btn-danger ml-1" onclick='deleteBank("${data.bank_id}")'>Hapus</button>`;
+                    } else if (userRole === 'admin') {
+                        buttons += `<button class="btn btn-sm btn-warning" onclick='editBank(${JSON.stringify(data)})'>Edit</button>`;
+                    }
+                    // Untuk user biasa tidak ditampilkan tombol apa-apa
+
+                    return buttons;
                 }
             }
         ]
@@ -158,7 +186,7 @@ $(document).ready(function () {
 });
 
 function editBank(data) {
-    $('#edit_mitra_id').val(data.mitra_id);
+    $('#edit_mitraid').val(data.mitraid);
     $('#edit_bank_id').val(data.bank_id);
     $('#edit_bank_server').val(data.bank_server);
     $('#edit_bank_client').val(data.bank_client);
@@ -169,11 +197,11 @@ function editBank(data) {
     $('#editBankModal').modal('show');
 }
 
-function deleteBank(mitra_id, bank_id) {
+function deleteBank(mitraid, bank_id) {
     if (confirm('Yakin ingin menghapus data bank ini?')) {
         $.post("{{ route('m_bank.destroy') }}", {
             _token: "{{ csrf_token() }}",
-            mitra_id, bank_id
+            mitraid, bank_id
         })
         .done(res => {
             $('#bankTable').DataTable().ajax.reload();

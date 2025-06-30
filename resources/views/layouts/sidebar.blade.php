@@ -45,6 +45,34 @@
                         </ul>
                     </li>
 
+                    <!-- Transaksi -->
+                    @php
+                        $isTransaksiDataActive = Request::is('Transaksi-*') || Request::is('transaksi-data/*');
+                    @endphp
+                    <li class="{{ $isTransaksiDataActive ? 'active' : '' }}">
+                        <a href="javascript:void(0)" aria-expanded="{{ $isTransaksiDataActive ? 'true' : 'false' }}">
+                            <i class="fa fa-table"></i> <span>Transaksi</span>
+                        </a>
+                        <ul class="collapse {{ $isTransaksiDataActive ? 'in' : '' }}">
+                            <li class="{{ Request::is('Transaksi-Cek-Log') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-Cek-Log') }}">Cek Log</a>
+                            </li>
+                            <li class="{{ Request::is('Transaksi-Unit') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-Unit') }}">M Unit</a>
+                            </li>
+                            <li class="{{ Request::is('Transaksi-Bank') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-Bank') }}">M Bank</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Log -->
+                    <li class="{{ Request::is('Cek-Log') ? 'active' : '' }}">
+                        <a href="{{ url('/Cek-Log') }}">
+                            <i class="ti-search"></i> <span>Cek Log</span>
+                        </a>
+                    </li>
+
 
                 </ul>
             </nav>

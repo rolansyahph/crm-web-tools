@@ -79,4 +79,11 @@ Route::group(['middleware' => 'check.session'], function () {
         Route::post('m-bank/delete', [App\Http\Controllers\BankController::class, 'destroy'])->name('m_bank.destroy');
     });
 
+    // Transaksi data
+    Route::view('/Transaksi-Cek-Log', 'transaksi.log.index');
+    Route::prefix('transaksi-data')->group(function () {
+        Route::get('/Transaksi-Cek-Log', [App\Http\Controllers\LogController::class, 'index'])->name('transaksi.log.index');
+        Route::get('/Cek-Log/data', [App\Http\Controllers\LogController::class, 'getData'])->name('log.data');
+    });
+
 });

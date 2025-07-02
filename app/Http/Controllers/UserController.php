@@ -98,24 +98,24 @@ class UserController extends Controller
     // END
 
     // M USER
+    // Tampilkan halaman index
     public function index()
     {
         return view('master_data.m_users.index');
     }
 
+    // Ambil data user dari database
     public function getData()
     {
         try {
             $rawData = DB::connection('mysql_dbticket')->select("SELECT * FROM m_user");
+
             $data = array_map(function ($item) {
                 return (array) $item;
             }, $rawData);
 
-            return response()->json([
-                'data' => $data
-            ]);
+            return response()->json(['data' => $data]);
 
-            // return $data;
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Gagal mengambil data: ' . $e->getMessage()
@@ -123,6 +123,7 @@ class UserController extends Controller
         }
     }
 
+    // Simpan user baru
     public function store(Request $request)
     {
         try {
@@ -130,34 +131,75 @@ class UserController extends Controller
                 ->selectOne("SELECT * FROM m_user WHERE userid = ?", [$request->userid]);
 
             if ($exists) {
+                $this->log_crm("Master Users - Create", json_encode(['message' => 'UserID sudah ada!']));
                 return response()->json(['message' => 'UserID sudah ada!'], 400);
             }
 
             $inputUser = session('userid');
 
-           DB::connection('mysql_dbticket')->insert(
-                "INSERT INTO m_user (userid, `password`, nama, roleuser, aktif, mitraid, inputuser, inputtanggal) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
-                [$request->userid, $request->password, $request->nama, $request->roleuser, $request->aktif, $request->mitraid, $inputUser]
+            DB::connection('mysql_dbticket')->insert(
+                "INSERT INTO m_user (userid, `password`, nama, roleuser, aktif, mitraid, inputuser, inputtanggal)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+                [
+                    $request->userid,
+                    $request->password,
+                    $request->nama,
+                    $request->roleuser,
+                    $request->aktif,
+                    $request->mitraid,
+                    $inputUser
+                ]
             );
 
+            $this->log_crm("Master Users - Create", json_encode([
+                'message' => 'User berhasil ditambahkan.',
+                'userid' => $request->userid,
+                'data' => $request->only(['nama', 'password', 'roleuser', 'aktif', 'mitraid'])
+            ]));
+
             return response()->json(['message' => 'User berhasil ditambahkan.']);
+
         } catch (\Exception $e) {
+            $this->log_crm("Master Users - Create", json_encode(['message' => 'Gagal tambah', 'error' => $e->getMessage()]));
             return response()->json(['message' => 'Gagal tambah: ' . $e->getMessage()], 500);
         }
     }
 
+    // Update user
     public function update(Request $request)
     {
         try {
             $updateUser = session('userid');
 
             DB::connection('mysql_dbticket')->update(
-                "UPDATE m_user SET nama = ?, `password` = ?, roleuser = ?, aktif = ?, mitraid = ?, updateuser = ?, updatetanggal = NOW() WHERE userid = ?",
-                [$request->nama, $request->password, $request->roleuser, $request->aktif, $request->mitraid, $updateUser, $request->userid]
+                "UPDATE m_user
+                SET nama = ?, `password` = ?, roleuser = ?, aktif = ?, mitraid = ?, updateuser = ?, updatetanggal = NOW()
+                WHERE userid = ?",
+                [
+                    $request->nama,
+                    $request->password,
+                    $request->roleuser,
+                    $request->aktif,
+                    $request->mitraid,
+                    $updateUser,
+                    $request->userid
+                ]
             );
 
+            // Log data hasil perubahan saja
+            $this->log_crm("Master Users - Update", json_encode([
+                'message' => 'User berhasil diupdate.',
+                'userid' => $request->userid,
+                'data' => $request->only(['nama', 'password', 'roleuser', 'aktif', 'mitraid'])
+            ]));
+
             return response()->json(['message' => 'User berhasil diupdate.']);
+
         } catch (\Exception $e) {
+            $this->log_crm("Master Users - Update", json_encode([
+                'message' => 'Gagal update',
+                'error' => $e->getMessage()
+            ]));
             return response()->json(['message' => 'Gagal update: ' . $e->getMessage()], 500);
         }
     }
@@ -165,18 +207,64 @@ class UserController extends Controller
     public function destroy(Request $request)
     {
         try {
+            // Ambil data sebelum dihapus (agar bisa dicatat di log)
+            $deletedData = DB::connection('mysql_dbticket')->selectOne(
+                "SELECT * FROM m_user WHERE userid = ?",
+                [$request->userid]
+            );
+
+            if (!$deletedData) {
+                return response()->json(['message' => 'User tidak ditemukan.'], 404);
+            }
+
+            // Lakukan penghapusan
             DB::connection('mysql_dbticket')->delete(
                 "DELETE FROM m_user WHERE userid = ?",
                 [$request->userid]
             );
 
+            // Catat log ke t_log_crm
+            $this->log_crm("Master Users - Delete", json_encode([
+                'message' => 'User berhasil dihapus.',
+                'userid' => $request->userid,
+                'data' => $deletedData
+            ]));
+
             return response()->json(['message' => 'User berhasil dihapus.']);
+
         } catch (\Exception $e) {
+            // Jika gagal hapus, catat juga log gagalnya
+            $this->log_crm("Master Users - Delete", json_encode([
+                'message' => 'Gagal hapus',
+                'error' => $e->getMessage()
+            ]));
+
             return response()->json(['message' => 'Gagal hapus: ' . $e->getMessage()], 500);
         }
     }
 
-    // END
+    // Fungsi privat untuk mencatat log CRM
+    private function log_crm($fungsi, $pesan)
+    {
+        try {
+            $userId = session('userid');
+            $now = now()->timezone('Asia/Jakarta');
+
+            $periode = $now->format('Ym');     // Format: yyyymm
+            $tanggal = $now->format('Ymd');    // Format: yyyymmdd
+            $jam = $now->format('His');        // Format: hhmmss
+
+            DB::connection('mysql_dbticket')->insert(
+                "INSERT INTO t_log_crm (periode, tanggal, jam, fungsi, pesan, userupdate)
+                 VALUES (?, ?, ?, ?, ?, ?)",
+                [$periode, $tanggal, $jam, $fungsi, $pesan, $userId]
+            );
+
+        } catch (\Exception $e) {
+            // Optional log fallback
+            \Log::error("Gagal mencatat log CRM: " . $e->getMessage());
+        }
+    }
 
 
 

@@ -13,42 +13,6 @@ class LogController extends Controller
         return view('transaksi.log.index');
     }
 
-// public function getData(Request $request)
-// {
-//     try {
-//         // Ambil parameter dari datatables
-//         $start = $request->input('start', 0);
-//         $length = $request->input('length', 10);
-//         $draw = $request->input('draw');
-
-//         // Hitung total data
-//         $total = DB::connection('mysql_dbticket')->table('t_log')->count();
-
-//         // Ambil data dengan offset dan limit
-//         $rawData = DB::connection('mysql_dbticket')
-//             ->table('t_log')
-//             ->orderByDesc('inputtanggal')
-//             ->offset($start)
-//             ->limit($length)
-//             ->get();
-
-//         $data = $rawData->map(function ($item) {
-//             $item = (array)$item;
-//             $item['datetime'] = $this->formatDatetime($item['tanggal'], $item['jam']);
-//             return $item;
-//         });
-
-//         return response()->json([
-//             'draw' => intval($draw),
-//             'recordsTotal' => $total,
-//             'recordsFiltered' => $total,
-//             'data' => $data,
-//         ]);
-//     } catch (\Exception $e) {
-//         return response()->json(['error' => 'Gagal mengambil data: ' . $e->getMessage()], 500);
-//     }
-// }
-
     public function getData(Request $request)
     {
         try {
@@ -78,10 +42,11 @@ class LogController extends Controller
             $totalFiltered = $query->count(); // Jumlah data setelah filter
 
             $logs = $query
-                ->orderByDesc('inputtanggal')
+                ->orderByRaw("CONCAT(LPAD(tanggal, 8, '0'), LPAD(jam, 6, '0')) DESC")
                 ->offset($start)
                 ->limit($length)
                 ->get();
+                
 
             $data = $logs->map(function ($item) {
                 $item = (array)$item;

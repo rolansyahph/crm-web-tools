@@ -1,7 +1,7 @@
 <!-- footer area start-->
 <footer>
     <div class="footer-area">
-        <p>© Copyright 2025. by PT.Layanan Imedia</a>.</p>
+        <p>Made with &#9829; By Layanan i-Media @2025</a>.</p>
     </div>
 </footer>
 <!-- footer area end-->

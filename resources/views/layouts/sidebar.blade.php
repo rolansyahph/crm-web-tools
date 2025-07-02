@@ -57,21 +57,21 @@
                             <li class="{{ Request::is('Transaksi-Cek-Log') ? 'active' : '' }}">
                                 <a href="{{ url('/Transaksi-Cek-Log') }}">Cek Log</a>
                             </li>
-                            <li class="{{ Request::is('Transaksi-Unit') ? 'active' : '' }}">
-                                <a href="{{ url('/Transaksi-Unit') }}">M Unit</a>
+                            <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-') }}">Ticket</a>
                             </li>
-                            <li class="{{ Request::is('Transaksi-Bank') ? 'active' : '' }}">
-                                <a href="{{ url('/Transaksi-Bank') }}">M Bank</a>
+                            <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-') }}">Topup</a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Log -->
+                    {{-- <!-- Log -->
                     <li class="{{ Request::is('Cek-Log') ? 'active' : '' }}">
                         <a href="{{ url('/Cek-Log') }}">
                             <i class="ti-search"></i> <span>Cek Log</span>
                         </a>
-                    </li>
+                    </li> --}}
 
 
                 </ul>

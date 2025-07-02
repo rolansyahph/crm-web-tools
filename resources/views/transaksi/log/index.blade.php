@@ -11,7 +11,7 @@
                         <table id="logTable" class="table table-striped table-bordered nowrap" style="width:100%">
                             <thead>
                                 <tr>
-                                    <th>Periode</th>
+                                    {{-- <th>Periode</th> --}}
                                     <th>Datetime</th>
                                     <th>Fungsi</th>
                                     <th>Key1</th>
@@ -40,7 +40,7 @@ $(document).ready(function () {
         serverSide: true,
         ajax: "{{ route('log.data') }}",
         columns: [
-            { data: "periode" },
+            // { data: "periode" },
             { data: "datetime" },
             { data: "fungsi" },
             { data: "key1" },

@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Traits\CrmLogger;
 
 class MitraController extends Controller
 {
+    use CrmLogger;
+
     public function index()
     {
         return view('master_data.m_mitra.index');
@@ -33,6 +36,10 @@ class MitraController extends Controller
                 ->selectOne("SELECT * FROM m_mitra WHERE mitraid = ?", [$request->mitraid]);
 
             if ($exists) {
+                $this->log_crm("Master Mitra - Create", json_encode([
+                    'message' => 'Mitra ID sudah ada!',
+                    'mitraid' => $request->mitraid
+                ]));
                 return response()->json(['message' => 'Mitra ID sudah ada!'], 400);
             }
 
@@ -49,8 +56,17 @@ class MitraController extends Controller
                 ]
             );
 
+            $this->log_crm("Master Mitra - Create", json_encode([
+                'message' => 'Mitra berhasil ditambahkan.',
+                'data' => $request->only(['mitraid', 'nama', 'alamat', 'region', 'aktif'])
+            ]));
+
             return response()->json(['message' => 'Mitra berhasil ditambahkan.']);
         } catch (\Exception $e) {
+            $this->log_crm("Master Mitra - Create", json_encode([
+                'message' => 'Gagal tambah',
+                'error' => $e->getMessage()
+            ]));
             return response()->json(['message' => 'Gagal tambah: ' . $e->getMessage()], 500);
         }
     }
@@ -71,8 +87,17 @@ class MitraController extends Controller
                 ]
             );
 
+            $this->log_crm("Master Mitra - Update", json_encode([
+                'message' => 'Mitra berhasil diupdate.',
+                'data' => $request->only(['mitraid', 'nama', 'alamat', 'region', 'aktif'])
+            ]));
+
             return response()->json(['message' => 'Mitra berhasil diupdate.']);
         } catch (\Exception $e) {
+            $this->log_crm("Master Mitra - Update", json_encode([
+                'message' => 'Gagal update',
+                'error' => $e->getMessage()
+            ]));
             return response()->json(['message' => 'Gagal update: ' . $e->getMessage()], 500);
         }
     }
@@ -80,11 +105,33 @@ class MitraController extends Controller
     public function destroy(Request $request)
     {
         try {
-            DB::connection('mysql_dbticket')->delete("DELETE FROM m_mitra WHERE mitraid = ?", [$request->mitraid]);
+            $deletedData = DB::connection('mysql_dbticket')->selectOne(
+                "SELECT * FROM m_mitra WHERE mitraid = ?",
+                [$request->mitraid]
+            );
+
+            if (!$deletedData) {
+                return response()->json(['message' => 'Mitra tidak ditemukan.'], 404);
+            }
+
+            DB::connection('mysql_dbticket')->delete(
+                "DELETE FROM m_mitra WHERE mitraid = ?",
+                [$request->mitraid]
+            );
+
+            $this->log_crm("Master Mitra - Delete", json_encode([
+                'message' => 'Mitra berhasil dihapus.',
+                'data' => $deletedData
+            ]));
+
             return response()->json(['message' => 'Mitra berhasil dihapus.']);
         } catch (\Exception $e) {
+            $this->log_crm("Master Mitra - Delete", json_encode([
+                'message' => 'Gagal hapus',
+                'error' => $e->getMessage()
+            ]));
+
             return response()->json(['message' => 'Gagal hapus: ' . $e->getMessage()], 500);
         }
     }
 }
-

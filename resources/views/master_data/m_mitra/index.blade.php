@@ -126,6 +126,8 @@
 @endsection
 
 @section('javascript')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#mitraTable')) {
@@ -153,18 +155,15 @@ $(document).ready(function () {
             { data: "updatetanggal", name: "updatetanggal" },
             {
                 data: null,
-                visible: !isUser, // <-- disembunyikan jika role 'user'
+                visible: !isUser,
                 render: function (data) {
                     let buttons = '';
-
                     if (userRole === 'root') {
                         buttons += `<button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>`;
                         buttons += `<button class="btn btn-sm btn-danger ml-1" onclick='deleteMitra("${data.mitraid}")'>Hapus</button>`;
                     } else if (userRole === 'admin') {
                         buttons += `<button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>`;
                     }
-                    // Untuk user biasa tidak ditampilkan tombol apa-apa
-
                     return buttons;
                 }
             }
@@ -174,31 +173,62 @@ $(document).ready(function () {
     // Submit tambah mitra
     $('#addMitraForm').submit(function (e) {
         e.preventDefault();
-        $.post("{{ route('m_mitra.store') }}", $(this).serialize())
-            .done(function (res) {
-                $('#addMitraModal').modal('hide');
-                table.ajax.reload();
-                alert(res.message);
-            })
-            .fail(function (xhr) {
-                alert(xhr.responseJSON.message || 'Terjadi kesalahan.');
-            });
+
+        Swal.fire({
+            title: 'Simpan Data?',
+            text: 'Apakah Anda yakin ingin menyimpan data mitra ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("{{ route('m_mitra.store') }}", $(this).serialize())
+                    .done(function (res) {
+                        $('#addMitraModal').modal('hide');
+                        $('#addMitraForm')[0].reset();
+                        table.ajax.reload();
+                        Swal.fire('Berhasil', res.message, 'success');
+                    })
+                    .fail(function (xhr) {
+                        Swal.fire('Gagal', xhr.responseJSON.message || 'Terjadi kesalahan.', 'error');
+                    });
+            }
+        });
     });
+
 
     // Submit edit mitra
     $('#editMitraForm').submit(function (e) {
         e.preventDefault();
-        $.post("{{ route('m_mitra.update') }}", $(this).serialize())
-            .done(function (res) {
-                $('#editMitraModal').modal('hide');
-                table.ajax.reload();
-                alert(res.message);
-            })
-            .fail(function (xhr) {
-                alert(xhr.responseJSON.message || 'Gagal update.');
-            });
+
+        Swal.fire({
+            title: 'Update Data?',
+            text: 'Apakah Anda yakin ingin mengupdate data mitra ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Update',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("{{ route('m_mitra.update') }}", $(this).serialize())
+                    .done(function (res) {
+                        $('#editMitraModal').modal('hide');
+                        table.ajax.reload();
+                        Swal.fire('Berhasil', res.message, 'success');
+                    })
+                    .fail(function (xhr) {
+                        Swal.fire('Gagal', xhr.responseJSON.message || 'Gagal update.', 'error');
+                    });
+            }
+        });
     });
 });
+
 
 // Modal edit
 function openEditModal(data) {
@@ -210,20 +240,33 @@ function openEditModal(data) {
     $('#editMitraModal').modal('show');
 }
 
+// SweetAlert konfirmasi hapus
 function deleteMitra(mitraid) {
-    if (confirm('Yakin ingin menghapus mitra ini?')) {
-        $.post("{{ route('m_mitra.destroy') }}", {
-            _token: "{{ csrf_token() }}",
-            mitraid: mitraid
-        })
-        .done(function (res) {
-            $('#mitraTable').DataTable().ajax.reload();
-            alert(res.message);
-        })
-        .fail(function (xhr) {
-            alert(xhr.responseJSON.message || 'Gagal menghapus mitra.');
-        });
-    }
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Data mitra ini akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("{{ route('m_mitra.destroy') }}", {
+                _token: "{{ csrf_token() }}",
+                mitraid: mitraid
+            })
+            .done(function (res) {
+                $('#mitraTable').DataTable().ajax.reload();
+                Swal.fire('Berhasil!', res.message, 'success');
+            })
+            .fail(function (xhr) {
+                Swal.fire('Gagal!', xhr.responseJSON.message || 'Gagal menghapus mitra.', 'error');
+            });
+        }
+    });
 }
 </script>
 @endsection
+

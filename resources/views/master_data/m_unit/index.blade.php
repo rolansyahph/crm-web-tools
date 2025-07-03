@@ -113,6 +113,8 @@
 @endsection
 
 @section('javascript')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#mitraTable')) {
@@ -136,24 +138,15 @@ $(document).ready(function () {
             { data: "keydb", name: "keydb" },
             {
                 data: null,
-                // render: function (data) {
-                //     return `
-                //         <button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>
-                //         <button class="btn btn-sm btn-danger ml-1" onclick='deleteUnit("${data.mitraid}", "${data.kdunit}")'>Hapus</button>
-                //     `;
-                // }
-                visible: !isUser, // <-- disembunyikan jika role 'user'
+                visible: !isUser,
                 render: function (data) {
                     let buttons = '';
-
                     if (userRole === 'root') {
                         buttons += `<button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>`;
                         buttons += `<button class="btn btn-sm btn-danger ml-1" onclick='deleteUnit("${data.mitraid}", "${data.kdunit}")'>Hapus</button>`;
                     } else if (userRole === 'admin') {
                         buttons += `<button class="btn btn-sm btn-warning" onclick='openEditModal(${JSON.stringify(data)})'>Edit</button>`;
                     }
-                    // Untuk user biasa tidak ditampilkan tombol apa-apa
-
                     return buttons;
                 }
             }
@@ -162,30 +155,61 @@ $(document).ready(function () {
 
     $('#addUnitForm').submit(function (e) {
         e.preventDefault();
-        $.post("{{ route('m_unit.store') }}", $(this).serialize())
-            .done(function (res) {
-                $('#addUnitModal').modal('hide');
-                table.ajax.reload();
-                alert(res.message);
-            })
-            .fail(function (xhr) {
-                alert(xhr.responseJSON.message || 'Terjadi kesalahan.');
-            });
+
+        Swal.fire({
+            title: 'Simpan Data?',
+            text: "Apakah Anda yakin ingin menyimpan unit ini?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("{{ route('m_unit.store') }}", $(this).serialize())
+                    .done(function (res) {
+                        $('#addUnitModal').modal('hide');
+                        $('#addUnitForm')[0].reset();
+                        $('#unitTable').DataTable().ajax.reload();
+                        Swal.fire('Berhasil', res.message, 'success');
+                    })
+                    .fail(function (xhr) {
+                        Swal.fire('Gagal', xhr.responseJSON.message || 'Terjadi kesalahan.', 'error');
+                    });
+            }
+        });
     });
+
 
     $('#editUnitForm').submit(function (e) {
         e.preventDefault();
-        $.post("{{ route('m_unit.update') }}", $(this).serialize())
-            .done(function (res) {
-                $('#editUnitModal').modal('hide');
-                table.ajax.reload();
-                alert(res.message);
-            })
-            .fail(function (xhr) {
-                alert(xhr.responseJSON.message || 'Gagal update.');
-            });
+
+        Swal.fire({
+            title: 'Update Data?',
+            text: "Apakah Anda yakin ingin mengupdate unit ini?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Update',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("{{ route('m_unit.update') }}", $(this).serialize())
+                    .done(function (res) {
+                        $('#editUnitModal').modal('hide');
+                        $('#unitTable').DataTable().ajax.reload();
+                        Swal.fire('Berhasil', res.message, 'success');
+                    })
+                    .fail(function (xhr) {
+                        Swal.fire('Gagal', xhr.responseJSON.message || 'Gagal update.', 'error');
+                    });
+            }
+        });
     });
 });
+
 
 function openEditModal(data) {
     $('#edit_mitraid').val(data.mitraid);
@@ -197,20 +221,32 @@ function openEditModal(data) {
 }
 
 function deleteUnit(mitraid, kdunit) {
-    if (confirm('Yakin ingin menghapus unit ini?')) {
-        $.post("{{ route('m_unit.destroy') }}", {
-            _token: "{{ csrf_token() }}",
-            mitraid: mitraid,
-            kdunit: kdunit
-        })
-        .done(function (res) {
-            $('#unitTable').DataTable().ajax.reload();
-            alert(res.message);
-        })
-        .fail(function (xhr) {
-            alert(xhr.responseJSON.message || 'Gagal menghapus unit.');
-        });
-    }
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Unit ini akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("{{ route('m_unit.destroy') }}", {
+                _token: "{{ csrf_token() }}",
+                mitraid: mitraid,
+                kdunit: kdunit
+            })
+            .done(function (res) {
+                $('#unitTable').DataTable().ajax.reload();
+                Swal.fire('Berhasil!', res.message, 'success');
+            })
+            .fail(function (xhr) {
+                Swal.fire('Gagal!', xhr.responseJSON.message || 'Gagal menghapus unit.', 'error');
+            });
+        }
+    });
 }
 </script>
 @endsection
+

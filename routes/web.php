@@ -20,7 +20,6 @@ use App\Http\Controllers\MitraController;
 // });
 
 Route::get('/test-db', [UserController::class, 'testConnection']);
-
 Route::get('/users', [UserController::class, 'index']);
 
 // Middleware Guest
@@ -37,53 +36,71 @@ Route::group(['middleware' => 'guest'], function () {
 Route::group(['middleware' => 'check.session'], function () {
 
     //Dasboard
-    Route::view('/Dasboard-CRM', 'dashboard.index');
+        Route::view('/Dasboard-CRM', 'dashboard.index');
+    //End Dasboard
 
-    //M_Users
-    Route::view('/Master-Users', 'master_data.m_users.index');
-    Route::prefix('master-data')->group(function () {
-        Route::get('m-users', [UserController::class, 'index'])->name('m_users.index');
-        Route::get('m-users/data', [UserController::class, 'getData'])->name('m_users.data');
-        Route::post('m-users/store', [UserController::class, 'store'])->name('m_users.store');
-        Route::post('m-users/update', [UserController::class, 'update'])->name('m_users.update');
-        Route::post('m-users/delete', [UserController::class, 'destroy'])->name('m_users.destroy');
-    });
+    // Master Data
+        //M_Users
+        Route::view('/Master-Users', 'master_data.m_users.index');
+        Route::prefix('master-data')->group(function () {
+            Route::get('m-users', [UserController::class, 'index'])->name('m_users.index');
+            Route::get('m-users/data', [UserController::class, 'getData'])->name('m_users.data');
+            Route::post('m-users/store', [UserController::class, 'store'])->name('m_users.store');
+            Route::post('m-users/update', [UserController::class, 'update'])->name('m_users.update');
+            Route::post('m-users/delete', [UserController::class, 'destroy'])->name('m_users.destroy');
+        });
 
-    // M_Mitra
-    Route::view('/Master-Mitra', 'master_data.m_mitra.index');
-    Route::prefix('master-data')->group(function () {
-        Route::get('m-mitra', [MitraController::class, 'index'])->name('m_mitra.index');
-        Route::get('m-mitra/data', [MitraController::class, 'getData'])->name('m_mitra.data');
-        Route::post('m-mitra/store', [MitraController::class, 'store'])->name('m_mitra.store');
-        Route::post('m-mitra/update', [MitraController::class, 'update'])->name('m_mitra.update');
-        Route::post('m-mitra/delete', [MitraController::class, 'destroy'])->name('m_mitra.destroy');
-    });
+        // M_Mitra
+        Route::view('/Master-Mitra', 'master_data.m_mitra.index');
+        Route::prefix('master-data')->group(function () {
+            Route::get('m-mitra', [MitraController::class, 'index'])->name('m_mitra.index');
+            Route::get('m-mitra/data', [MitraController::class, 'getData'])->name('m_mitra.data');
+            Route::post('m-mitra/store', [MitraController::class, 'store'])->name('m_mitra.store');
+            Route::post('m-mitra/update', [MitraController::class, 'update'])->name('m_mitra.update');
+            Route::post('m-mitra/delete', [MitraController::class, 'destroy'])->name('m_mitra.destroy');
+        });
 
-    // M_Unit
-    Route::view('/Master-Unit', 'master_data.m_unit.index');
-    Route::prefix('master-data')->group(function () {
-        Route::get('m-unit', [App\Http\Controllers\UnitController::class, 'index'])->name('m_unit.index');
-        Route::get('m-unit/data', [App\Http\Controllers\UnitController::class, 'getData'])->name('m_unit.data');
-        Route::post('m-unit/store', [App\Http\Controllers\UnitController::class, 'store'])->name('m_unit.store');
-        Route::post('m-unit/update', [App\Http\Controllers\UnitController::class, 'update'])->name('m_unit.update');
-        Route::post('m-unit/delete', [App\Http\Controllers\UnitController::class, 'destroy'])->name('m_unit.destroy');
-    });
+        // M_Unit
+        Route::view('/Master-Unit', 'master_data.m_unit.index');
+        Route::prefix('master-data')->group(function () {
+            Route::get('m-unit', [App\Http\Controllers\UnitController::class, 'index'])->name('m_unit.index');
+            Route::get('m-unit/data', [App\Http\Controllers\UnitController::class, 'getData'])->name('m_unit.data');
+            Route::post('m-unit/store', [App\Http\Controllers\UnitController::class, 'store'])->name('m_unit.store');
+            Route::post('m-unit/update', [App\Http\Controllers\UnitController::class, 'update'])->name('m_unit.update');
+            Route::post('m-unit/delete', [App\Http\Controllers\UnitController::class, 'destroy'])->name('m_unit.destroy');
+        });
 
-    // M_Bank
-    Route::view('/Master-Bank', 'master_data.m_bank.index');
-    Route::prefix('master-data')->group(function () {
-        Route::get('m-bank', [App\Http\Controllers\BankController::class, 'index'])->name('m_bank.index');
-        Route::get('m-bank/data', [App\Http\Controllers\BankController::class, 'getData'])->name('m_bank.data');
-        Route::post('m-bank/store', [App\Http\Controllers\BankController::class, 'store'])->name('m_bank.store');
-        Route::post('m-bank/update', [App\Http\Controllers\BankController::class, 'update'])->name('m_bank.update');
-        Route::post('m-bank/delete', [App\Http\Controllers\BankController::class, 'destroy'])->name('m_bank.destroy');
-    });
+        // M_Bank
+        Route::view('/Master-Bank', 'master_data.m_bank.index');
+        Route::prefix('master-data')->group(function () {
+            Route::get('m-bank', [App\Http\Controllers\BankController::class, 'index'])->name('m_bank.index');
+            Route::get('m-bank/data', [App\Http\Controllers\BankController::class, 'getData'])->name('m_bank.data');
+            Route::post('m-bank/store', [App\Http\Controllers\BankController::class, 'store'])->name('m_bank.store');
+            Route::post('m-bank/update', [App\Http\Controllers\BankController::class, 'update'])->name('m_bank.update');
+            Route::post('m-bank/delete', [App\Http\Controllers\BankController::class, 'destroy'])->name('m_bank.destroy');
+        });
 
-    // Transaksi data
-    Route::view('/Transaksi-Cek-Log', 'transaksi.log.index');
-    Route::prefix('transaksi-data')->group(function () {
-        Route::get('/Transaksi-Cek-Log', [App\Http\Controllers\LogController::class, 'index'])->name('transaksi.log.index');
-        Route::get('/Cek-Log/data', [App\Http\Controllers\LogController::class, 'getData'])->name('log.data');
-    });
+    // End Master Data
+
+    // Transaksi
+        // Ticket
+
+    //End Transaksi
+
+    // Tools
+        // Tool Log Transaksi
+        Route::view('/Tool-Log-Transaksi', 'tools.log_transaksi.index');
+        Route::prefix('tools-data')->group(function () {
+            Route::get('/Tool-Log-Transaksi', [App\Http\Controllers\LogTransaksiController::class, 'index'])->name('tools.log_transaksi.index');
+            Route::get('/Log-Transaksi/data', [App\Http\Controllers\LogTransaksiController::class, 'getData'])->name('log_transaksi.data');
+        });
+
+        // Tool Log CRM
+        Route::view('/Tool-Log-CRM', 'tools.log_crm.index');
+        Route::prefix('tools-data')->group(function () {
+            Route::get('/Tool-Log-CRM', [App\Http\Controllers\LogCRMController::class, 'index'])->name('tools.log_crm.index');
+            Route::get('/Log-CRM/data', [App\Http\Controllers\LogCRMController::class, 'getData'])->name('log_crm.data');
+        });
+    // End Tools
 
 });

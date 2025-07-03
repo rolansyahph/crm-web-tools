@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\CrmLogger;
 
 class UserController extends Controller
 {
+    use CrmLogger;
+
     public function testConnection()
     {
         try {
@@ -89,8 +92,8 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout(); 
-        $request->session()->invalidate(); 
+        Auth::logout();
+        $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/')->with('sukses', 'Logout berhasil');
     }
@@ -242,30 +245,5 @@ class UserController extends Controller
             return response()->json(['message' => 'Gagal hapus: ' . $e->getMessage()], 500);
         }
     }
-
-    // Fungsi privat untuk mencatat log CRM
-    private function log_crm($fungsi, $pesan)
-    {
-        try {
-            $userId = session('userid');
-            $now = now()->timezone('Asia/Jakarta');
-
-            $periode = $now->format('Ym');     // Format: yyyymm
-            $tanggal = $now->format('Ymd');    // Format: yyyymmdd
-            $jam = $now->format('His');        // Format: hhmmss
-
-            DB::connection('mysql_dbticket')->insert(
-                "INSERT INTO t_log_crm (periode, tanggal, jam, fungsi, pesan, userupdate)
-                 VALUES (?, ?, ?, ?, ?, ?)",
-                [$periode, $tanggal, $jam, $fungsi, $pesan, $userId]
-            );
-
-        } catch (\Exception $e) {
-            // Optional log fallback
-            \Log::error("Gagal mencatat log CRM: " . $e->getMessage());
-        }
-    }
-
-
 
 }

@@ -19,13 +19,31 @@
                         </a>
                     </li>
 
+                    <!-- Transaksi -->
+                    @php
+                        $isTransaksiDataActive = Request::is('Transaksi-*') || Request::is('transaksi-data/*');
+                    @endphp
+                    <li class="{{ $isTransaksiDataActive ? 'active' : '' }}">
+                        <a href="javascript:void(0)" aria-expanded="{{ $isTransaksiDataActive ? 'true' : 'false' }}">
+                            <i class="fa fa-money"></i> <span>Transaksi</span>
+                        </a>
+                        <ul class="collapse {{ $isTransaksiDataActive ? 'in' : '' }}">
+                            <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-') }}">Ticket</a>
+                            </li>
+                            <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-') }}">Topup</a>
+                            </li>
+                        </ul>
+                    </li>
+
                     <!-- Master Data -->
                     @php
                         $isMasterDataActive = Request::is('Master-*') || Request::is('master-data/*');
                     @endphp
                     <li class="{{ $isMasterDataActive ? 'active' : '' }}">
                         <a href="javascript:void(0)" aria-expanded="{{ $isMasterDataActive ? 'true' : 'false' }}">
-                            <i class="fa fa-table"></i> <span>Master Data</span>
+                            <i class="fa fa-database"></i> <span>Master Data</span>
                         </a>
                         <ul class="collapse {{ $isMasterDataActive ? 'in' : '' }}">
                             @if (session('role') === 'root')
@@ -45,34 +63,23 @@
                         </ul>
                     </li>
 
-                    <!-- Transaksi -->
+                    <!-- Tools -->
                     @php
-                        $isTransaksiDataActive = Request::is('Transaksi-*') || Request::is('transaksi-data/*');
+                        $isToolsDataActive = Request::is('Tool-*') || Request::is('tools-data/*');
                     @endphp
-                    <li class="{{ $isTransaksiDataActive ? 'active' : '' }}">
-                        <a href="javascript:void(0)" aria-expanded="{{ $isTransaksiDataActive ? 'true' : 'false' }}">
-                            <i class="fa fa-table"></i> <span>Transaksi</span>
+                    <li class="{{ $isToolsDataActive ? 'active' : '' }}">
+                        <a href="javascript:void(0)" aria-expanded="{{ $isToolsDataActive ? 'true' : 'false' }}">
+                            <i class="fa fa-gears"></i> <span>Tools</span>
                         </a>
-                        <ul class="collapse {{ $isTransaksiDataActive ? 'in' : '' }}">
-                            <li class="{{ Request::is('Transaksi-Cek-Log') ? 'active' : '' }}">
-                                <a href="{{ url('/Transaksi-Cek-Log') }}">Cek Log</a>
+                        <ul class="collapse {{ $isToolsDataActive ? 'in' : '' }}">
+                            <li class="{{ Request::is('Tool-Log-Transaksi') ? 'active' : '' }}">
+                                <a href="{{ url('/Tool-Log-Transaksi') }}">Log Transaksi</a>
                             </li>
-                            <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
-                                <a href="{{ url('/Transaksi-') }}">Ticket</a>
-                            </li>
-                            <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
-                                <a href="{{ url('/Transaksi-') }}">Topup</a>
+                            <li class="{{ Request::is('Tool-Log-CRM') ? 'active' : '' }}">
+                                <a href="{{ url('/Tool-Log-CRM') }}">Log CRM</a>
                             </li>
                         </ul>
                     </li>
-
-                    {{-- <!-- Log -->
-                    <li class="{{ Request::is('Cek-Log') ? 'active' : '' }}">
-                        <a href="{{ url('/Cek-Log') }}">
-                            <i class="ti-search"></i> <span>Cek Log</span>
-                        </a>
-                    </li> --}}
-
 
                 </ul>
             </nav>

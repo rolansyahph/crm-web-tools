@@ -1192,9 +1192,16 @@ table.dbkit-table tr td {
 }
 
 .footer-area {
-    text-align: center;
+    /* text-align: center;
     padding: 23px 0 19px;
+    background: #fff; */
+    text-align: center;
+    /* padding: 15px 0 12px; */
     background: #fff;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
 
 .footer-area p {

@@ -115,6 +115,8 @@
 @endsection
 
 @section('javascript')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#mitraTable')) {
@@ -144,44 +146,76 @@ $(document).ready(function () {
             { data: 'lastupdate_tgl' },
             {
                 data: null,
-                visible: !isUser, // <-- disembunyikan jika role 'user'
+                visible: !isUser,
                 render: function (data) {
                     let buttons = '';
-
                     if (userRole === 'root') {
                         buttons += `<button class="btn btn-sm btn-warning" onclick='editBank(${JSON.stringify(data)})'>Edit</button>`;
-                        buttons += `<button class="btn btn-sm btn-danger ml-1" onclick='deleteBank("${data.bank_id}")'>Hapus</button>`;
+                        buttons += `<button class="btn btn-sm btn-danger ml-1" onclick='deleteBank("${data.mitraid}", "${data.bank_id}")'>Hapus</button>`;
                     } else if (userRole === 'admin') {
                         buttons += `<button class="btn btn-sm btn-warning" onclick='editBank(${JSON.stringify(data)})'>Edit</button>`;
                     }
-                    // Untuk user biasa tidak ditampilkan tombol apa-apa
-
                     return buttons;
                 }
             }
         ]
     });
 
+    // Submit tambah bank
     $('#addBankForm').submit(function (e) {
         e.preventDefault();
-        $.post("{{ route('m_bank.store') }}", $(this).serialize())
-            .done(res => {
-                $('#addBankModal').modal('hide');
-                table.ajax.reload();
-                alert(res.message);
-            })
-            .fail(xhr => alert(xhr.responseJSON.message || 'Gagal menambah data.'));
+
+        Swal.fire({
+            title: 'Simpan Data?',
+            text: 'Apakah Anda yakin ingin menyimpan data bank ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("{{ route('m_bank.store') }}", $(this).serialize())
+                    .done(res => {
+                        $('#addBankModal').modal('hide');
+                        $('#addBankForm')[0].reset();
+                        table.ajax.reload();
+                        Swal.fire('Berhasil', res.message, 'success');
+                    })
+                    .fail(xhr => {
+                        Swal.fire('Gagal', xhr.responseJSON.message || 'Gagal menambah data.', 'error');
+                    });
+            }
+        });
     });
 
+    // Submit edit bank
     $('#editBankForm').submit(function (e) {
         e.preventDefault();
-        $.post("{{ route('m_bank.update') }}", $(this).serialize())
-            .done(res => {
-                $('#editBankModal').modal('hide');
-                table.ajax.reload();
-                alert(res.message);
-            })
-            .fail(xhr => alert(xhr.responseJSON.message || 'Gagal mengubah data.'));
+
+        Swal.fire({
+            title: 'Update Data?',
+            text: 'Apakah Anda yakin ingin mengupdate data bank ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Update',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("{{ route('m_bank.update') }}", $(this).serialize())
+                    .done(res => {
+                        $('#editBankModal').modal('hide');
+                        table.ajax.reload();
+                        Swal.fire('Berhasil', res.message, 'success');
+                    })
+                    .fail(xhr => {
+                        Swal.fire('Gagal', xhr.responseJSON.message || 'Gagal mengubah data.', 'error');
+                    });
+            }
+        });
     });
 });
 
@@ -198,17 +232,32 @@ function editBank(data) {
 }
 
 function deleteBank(mitraid, bank_id) {
-    if (confirm('Yakin ingin menghapus data bank ini?')) {
-        $.post("{{ route('m_bank.destroy') }}", {
-            _token: "{{ csrf_token() }}",
-            mitraid, bank_id
-        })
-        .done(res => {
-            $('#bankTable').DataTable().ajax.reload();
-            alert(res.message);
-        })
-        .fail(xhr => alert(xhr.responseJSON.message || 'Gagal menghapus data.'));
-    }
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Data bank ini akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("{{ route('m_bank.destroy') }}", {
+                _token: "{{ csrf_token() }}",
+                mitraid,
+                bank_id
+            })
+            .done(res => {
+                $('#bankTable').DataTable().ajax.reload();
+                Swal.fire('Berhasil', res.message, 'success');
+            })
+            .fail(xhr => {
+                Swal.fire('Gagal', xhr.responseJSON.message || 'Gagal menghapus data.', 'error');
+            });
+        }
+    });
 }
 </script>
 @endsection
+

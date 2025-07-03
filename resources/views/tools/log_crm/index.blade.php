@@ -6,20 +6,16 @@
         <div class="col-12 mt-1">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title">Cek Log</h4>
+                    <h4 class="header-title">Log CRM</h4>
                     <div class="data-tables datatable-dark">
-                        <table id="logTable" class="table table-striped table-bordered nowrap" style="width:100%">
+                        <table id="logCRMTable" class="table table-striped table-bordered table-hover nowrap" style="width:100%">
                             <thead>
                                 <tr>
                                     {{-- <th>Periode</th> --}}
                                     <th>Datetime</th>
                                     <th>Fungsi</th>
-                                    <th>Key1</th>
-                                    <th>Key2</th>
-                                    <th>Key3</th>
+                                    <th>User Update</th>
                                     <th>Pesan</th>
-                                    <th>Input User</th>
-                                    <th>Input Tanggal</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -35,23 +31,20 @@
 @section('javascript')
 <script>
 $(document).ready(function () {
-    $('#logTable').DataTable({
+    $('#logCRMTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('log.data') }}",
+        ajax: "{{ route('log_crm.data') }}",
         columns: [
             // { data: "periode" },
             { data: "datetime" },
             { data: "fungsi" },
-            { data: "key1" },
-            { data: "key2" },
-            { data: "key3" },
-            { data: "pesan" },
-            { data: "inputuser" },
-            { data: "inputtanggal" }
+            { data: "userupdate" },
+            { data: "pesan" }
         ],
-        scrollX: true,        // ✅ Aktifkan scroll horizontal
-        responsive: false     // ✅ Nonaktifkan mode responsif collapse
+        order: [[0, 'desc']],
+        scrollX: true,
+        responsive: false
     });
 });
 </script>

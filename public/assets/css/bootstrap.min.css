@@ -1809,12 +1809,13 @@ pre code {
     border-bottom-width: 2px
 }
 
+/* ada perubahan di hover tabel */
 .table-striped tbody tr:nth-of-type(odd) {
     background-color: rgba(0, 0, 0, .05)
 }
 
 .table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, .075)
+    background-color: rgba(65, 85, 107, 0.301)
 }
 
 .table-primary,

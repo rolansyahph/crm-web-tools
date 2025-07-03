@@ -147,14 +147,11 @@
 @endsection
 
 @section('javascript')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
 $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#dataTable3')) {
         $('#dataTable3').DataTable().clear().destroy();
     }
-
     const userRole = "{{ session('role') }}";
     const isUser = userRole === 'user';
 
@@ -196,65 +193,32 @@ $(document).ready(function () {
         ]
     });
 
-    // Tambah user
     $('#addUserForm').submit(function (e) {
         e.preventDefault();
-
-        Swal.fire({
-            title: 'Simpan Data?',
-            text: "Apakah Anda yakin ingin menyimpan user ini?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Simpan',
-            cancelButtonText: 'Batal',
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post("{{ route('m_users.store') }}", $(this).serialize())
-                    .done(function (res) {
-                        $('#addUserModal').modal('hide');
-                        $('#addUserForm')[0].reset();
-                        $('#dataTable3').DataTable().ajax.reload();
-                        Swal.fire('Berhasil', res.message, 'success');
-                    })
-                    .fail(function (xhr) {
-                        Swal.fire('Gagal', xhr.responseJSON.message || 'Terjadi kesalahan.', 'error');
-                    });
-            }
-        });
+        $.post("{{ route('m_users.store') }}", $(this).serialize())
+            .done(function (res) {
+                $('#addUserModal').modal('hide');
+                table.ajax.reload();
+                alert(res.message);
+            })
+            .fail(function (xhr) {
+                alert(xhr.responseJSON.message || 'Terjadi kesalahan.');
+            });
     });
 
-    // Edit user
     $('#editUserForm').submit(function (e) {
         e.preventDefault();
-
-        Swal.fire({
-            title: 'Update Data?',
-            text: "Apakah Anda yakin ingin mengupdate data user ini?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Update',
-            cancelButtonText: 'Batal',
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post("{{ route('m_users.update') }}", $(this).serialize())
-                    .done(function (res) {
-                        $('#editUserModal').modal('hide');
-                        $('#dataTable3').DataTable().ajax.reload();
-                        Swal.fire('Berhasil', res.message, 'success');
-                    })
-                    .fail(function (xhr) {
-                        Swal.fire('Gagal', xhr.responseJSON.message || 'Gagal update.', 'error');
-                    });
-            }
-        });
+        $.post("{{ route('m_users.update') }}", $(this).serialize())
+            .done(function (res) {
+                $('#editUserModal').modal('hide');
+                table.ajax.reload();
+                alert(res.message);
+            })
+            .fail(function (xhr) {
+                alert(xhr.responseJSON.message || 'Gagal update.');
+            });
     });
 
-
-    // Buka modal edit
     window.openEditModal = function (data) {
         $('#edit_userid').val(data.userid);
         $('#edit_nama').val(data.nama);
@@ -265,32 +229,20 @@ $(document).ready(function () {
         $('#editUserModal').modal('show');
     }
 
-    // Hapus user dengan SweetAlert
     window.deleteUser = function (userid) {
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "User ini akan dihapus permanen!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post("{{ route('m_users.destroy') }}", {
-                    _token: "{{ csrf_token() }}",
-                    userid: userid
-                })
-                .done(function (res) {
-                    table.ajax.reload();
-                    Swal.fire('Berhasil', res.message, 'success');
-                })
-                .fail(function (xhr) {
-                    Swal.fire('Gagal', xhr.responseJSON.message || 'Gagal menghapus user.', 'error');
-                });
-            }
-        });
+        if (confirm('Yakin ingin menghapus user ini?')) {
+            $.post("{{ route('m_users.destroy') }}", {
+                _token: "{{ csrf_token() }}",
+                userid: userid
+            })
+            .done(function (res) {
+                table.ajax.reload();
+                alert(res.message);
+            })
+            .fail(function (xhr) {
+                alert(xhr.responseJSON.message || 'Gagal menghapus user.');
+            });
+        }
     }
 });
 </script>

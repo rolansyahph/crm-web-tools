@@ -28,11 +28,11 @@
                             <i class="fa fa-money"></i> <span>Transaksi</span>
                         </a>
                         <ul class="collapse {{ $isTransaksiDataActive ? 'in' : '' }}">
-                            <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
-                                <a href="{{ url('/Transaksi-') }}">Ticket</a>
+                            <li class="{{ Request::is('Transaksi-Topup') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-Topup') }}">Topup</a>
                             </li>
                             <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
-                                <a href="{{ url('/Transaksi-') }}">Topup</a>
+                                <a href="{{ url('/Transaksi-') }}">Ticket</a>
                             </li>
                         </ul>
                     </li>

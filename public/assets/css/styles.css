@@ -1204,8 +1204,11 @@ table.dbkit-table tr td {
     width: 100%;
 }
 
+/* Perubahan footer */
 .footer-area p {
-    color: #676666;
+    /* color: #676666; */
+    color: #fff;
+    background: #303641;
     margin-bottom: 0;
 }
 

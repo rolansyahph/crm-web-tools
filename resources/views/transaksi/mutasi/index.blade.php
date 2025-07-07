@@ -6,25 +6,23 @@
         <div class="col-12 mt-1">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title">Data Topup</h4>
+                    <h4 class="header-title">Data Mutasi</h4>
                     <div class="data-tables datatable-dark">
-                        <table id="topupTable" class="table table-striped table-bordered table-hover nowrap" style="width:100%">
+                        <table id="mutasiTable" class="table table-striped table-bordered table-hover nowrap" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>Datetime</th>
-                                    <th>Via</th>
-                                    <th>User ID</th>
-                                    <th>Setor 1</th>
-                                    <th>Setor 2</th>
-                                    <th>Tiecket ID</th>
-                                    <th>Bank ID</th>
+                                    <th>Mitra ID</th>
+                                    <th>Periode</th>
+                                    <th>DK</th>
+                                    <th>Mutasi</th>
+                                    <th>Saldo Akhir</th>
+                                    <th>Bank</th>
                                     <th>No Rek</th>
-                                    <th>Trx ID</th>
-                                    <th>Keterangan</th>
+                                    <th>Mutasi Info</th>
+                                    <th>User ID</th>
                                     <th>Status</th>
-                                    <th>Status Ket</th>
-                                    <th>Input User</th>
-                                    <th>Input Tanggal</th>
+                                    <th>Status Info</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -41,31 +39,29 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {
-        const table = $('#topupTable').DataTable({
+        $('#mutasiTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('topup_transaksi.data') }}",
+            ajax: "{{ route('mutasi_transaksi.data') }}",
             columns: [
                 { data: "datetime" },
-                { data: "via" },
-                { data: "userid" },
+                { data: "mitraid" },
+                { data: "periode" },
+                { data: "dk" },
                 {
-                    data: "jmlsetor1",
+                    data: "mutasi",
                     render: $.fn.dataTable.render.number('.', ',', 0, '')
                 },
                 {
-                    data: "jmlsetor2",
+                    data: "saldoakhir",
                     render: $.fn.dataTable.render.number('.', ',', 0, '')
                 },
-                { data: "ticketid" },
-                { data: "bankid" },
+                { data: "bank" },
                 { data: "norek" },
-                { data: "trxid" },
-                { data: "ket" },
+                { data: "mutasiinfo" },
+                { data: "userid" },
                 { data: "status" },
-                { data: "status_ket" },
-                { data: "inputuser" },
-                { data: "inputtanggal" }
+                { data: "statusinfo" }
             ],
             order: [[0, 'desc']],
             scrollX: true,
@@ -73,4 +69,5 @@
         });
     });
 </script>
+
 @endsection

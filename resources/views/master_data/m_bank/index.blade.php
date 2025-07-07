@@ -128,7 +128,7 @@ $(document).ready(function () {
 
     const table = $('#bankTable').DataTable({
         scrollX: true,
-        responsive: true,
+        responsive: false,
         processing: true,
         ajax: "{{ route('m_bank.data') }}",
         columns: [

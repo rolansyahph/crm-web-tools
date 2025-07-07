@@ -126,7 +126,7 @@ $(document).ready(function () {
 
     const table = $('#unitTable').DataTable({
         scrollX: true,
-        responsive: true,
+        responsive: false,
         processing: true,
         serverSide: false,
         ajax: "{{ route('m_unit.data') }}",

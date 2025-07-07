@@ -160,7 +160,7 @@ $(document).ready(function () {
 
     const table = $('#dataTable3').DataTable({
         scrollX: true,
-        responsive: true,
+        responsive: false,
         processing: true,
         serverSide: false,
         ajax: "{{ route('m_users.data') }}",

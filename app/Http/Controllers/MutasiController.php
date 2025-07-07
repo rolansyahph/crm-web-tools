@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class TopupController extends Controller
+class MutasiController extends Controller
 {
     public function index()
     {
-        return view('transaksi.topup.index');
+        return view('transaksi.mutasi.index');
     }
 
     public function getData(Request $request)
@@ -19,47 +19,45 @@ class TopupController extends Controller
             $draw = $request->input('draw');
             $search = $request->input('search.value');
 
-            $query = DB::connection('mysql_dbticket')->table('t_topup');
+            $query = DB::connection('mysql_dbticket')->table('t_mutasi');
 
-            // Filter pencarian
             if (!empty($search)) {
                 $query->where(function ($q) use ($search) {
-                    $q->orWhere('periode', 'LIKE', "%{$search}%")
-                      ->orWhere('tanggal', 'LIKE', "%{$search}%")
-                      ->orWhere('jam', 'LIKE', "%{$search}%")
-                      ->orWhere('via', 'LIKE', "%{$search}%")
-                      ->orWhere('userid', 'LIKE', "%{$search}%")
-                      ->orWhere('jmlsetor1', 'LIKE', "%{$search}%")
-                      ->orWhere('jmlsetor2', 'LIKE', "%{$search}%")
-                      ->orWhere('bankid', 'LIKE', "%{$search}%")
-                      ->orWhere('norek', 'LIKE', "%{$search}%")
-                      ->orWhere('trxid', 'LIKE', "%{$search}%")
-                      ->orWhere('ket', 'LIKE', "%{$search}%")
-                      ->orWhere('status_ket', 'LIKE', "%{$search}%")
-                      ->orWhere('inputuser', 'LIKE', "%{$search}%")
-                      ->orWhere('inputtanggal', 'LIKE', "%{$search}%");
+                    $q->orWhere('mitraid', 'LIKE', "%{$search}%")
+                    ->orWhere('periode', 'LIKE', "%{$search}%")
+                    ->orWhere('tanggal', 'LIKE', "%{$search}%")
+                    ->orWhere('jam', 'LIKE', "%{$search}%")
+                    ->orWhere('dk', 'LIKE', "%{$search}%")
+                    ->orWhere('mutasi', 'LIKE', "%{$search}%")
+                    ->orWhere('saldoakhir', 'LIKE', "%{$search}%")
+                    ->orWhere('bank', 'LIKE', "%{$search}%")
+                    ->orWhere('norek', 'LIKE', "%{$search}%")
+                    ->orWhere('mutasiinfo', 'LIKE', "%{$search}%")
+                    ->orWhere('userid', 'LIKE', "%{$search}%")
+                    ->orWhere('status', 'LIKE', "%{$search}%")
+                    ->orWhere('statusinfo', 'LIKE', "%{$search}%");
                 });
             }
 
             $totalFiltered = $query->count();
 
-            // Sorting
             $orderColumnIndex = $request->input('order.0.column');
             $orderDirection = $request->input('order.0.dir');
 
             $orderableColumns = [
-                'tanggal',      // index 0
-                'via',          // index 1
-                'userid',       // index 2
-                'jmlsetor1',    // index 3
-                'jmlsetor2',    // index 4
-                'bankid',       // index 5
-                'trxid',        // index 6
-                'ket',          // index 7
-                'status',       // index 8
-                'status_ket',    // index 9
-                'inputuser',    // index 10
-                'inputtanggal'  // index 11
+                'mitraid',
+                'periode',
+                'tanggal',
+                'jam',
+                'dk',
+                'mutasi',
+                'saldoakhir',
+                'bank',
+                'norek',
+                'mutasiinfo',
+                'userid',
+                'status',
+                'statusinfo'
             ];
 
             if (isset($orderableColumns[$orderColumnIndex])) {
@@ -74,18 +72,15 @@ class TopupController extends Controller
                 $query->orderBy('tanggal', 'desc')->orderBy('jam', 'desc');
             }
 
-            $topups = $query
-                ->offset($start)
-                ->limit($length)
-                ->get();
+            $mutasi = $query->offset($start)->limit($length)->get();
 
-            $data = $topups->map(function ($item) {
-                $item = (array)$item;
+            $data = $mutasi->map(function ($item) {
+                $item = (array) $item;
                 $item['datetime'] = $this->formatDatetime($item['tanggal'], $item['jam']);
                 return $item;
             });
 
-            $totalData = DB::connection('mysql_dbticket')->table('t_topup')->count();
+            $totalData = DB::connection('mysql_dbticket')->table('t_mutasi')->count();
 
             return response()->json([
                 'draw' => intval($draw),
@@ -93,11 +88,11 @@ class TopupController extends Controller
                 'recordsFiltered' => $totalFiltered,
                 'data' => $data,
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['error' => 'Gagal mengambil data: ' . $e->getMessage()], 500);
         }
     }
+
 
     private function formatDatetime($tanggal, $jam)
     {

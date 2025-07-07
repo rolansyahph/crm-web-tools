@@ -31,8 +31,17 @@
                             <li class="{{ Request::is('Transaksi-Topup') ? 'active' : '' }}">
                                 <a href="{{ url('/Transaksi-Topup') }}">Topup</a>
                             </li>
-                            <li class="{{ Request::is('Transaksi-') ? 'active' : '' }}">
-                                <a href="{{ url('/Transaksi-') }}">Ticket</a>
+                            <li class="{{ Request::is('Transaksi-Mutasi') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-Mutasi') }}">Mutasi</a>
+                            </li>
+                                <li class="{{ Request::is('Transaksi-Ticket') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-Ticket') }}">Ticket</a>
+                            </li>
+                                <li class="{{ Request::is('Transaksi-Inbox') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-Inbox') }}">Inbox</a>
+                            </li>
+                                <li class="{{ Request::is('Transaksi-Outbox') ? 'active' : '' }}">
+                                <a href="{{ url('/Transaksi-Outbox') }}">Outbox</a>
                             </li>
                         </ul>
                     </li>
@@ -48,17 +57,17 @@
                         <ul class="collapse {{ $isMasterDataActive ? 'in' : '' }}">
                             @if (session('role') === 'root')
                                 <li class="{{ Request::is('Master-Users') ? 'active' : '' }}">
-                                    <a href="{{ url('/Master-Users') }}">M Users</a>
+                                    <a href="{{ url('/Master-Users') }}">Users</a>
                                 </li>
                             @endif
                             <li class="{{ Request::is('Master-Mitra') ? 'active' : '' }}">
-                                <a href="{{ url('/Master-Mitra') }}">M Mitra</a>
+                                <a href="{{ url('/Master-Mitra') }}">Mitra</a>
                             </li>
                             <li class="{{ Request::is('Master-Unit') ? 'active' : '' }}">
-                                <a href="{{ url('/Master-Unit') }}">M Unit</a>
+                                <a href="{{ url('/Master-Unit') }}">Unit</a>
                             </li>
                             <li class="{{ Request::is('Master-Bank') ? 'active' : '' }}">
-                                <a href="{{ url('/Master-Bank') }}">M Bank</a>
+                                <a href="{{ url('/Master-Bank') }}">Bank</a>
                             </li>
                         </ul>
                     </li>

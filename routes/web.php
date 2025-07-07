@@ -84,19 +84,38 @@ Route::group(['middleware' => 'check.session'], function () {
 
     // Transaksi
         // Topup
-        Route::view('/transaksi/topup', 'transaksi.topup.index')->name('topup.index');
-
-        // Route untuk DataTables AJAX
-        Route::prefix('transaksi')->group(function () {
-            Route::get('/topup/data', [App\Http\Controllers\TopupController::class, 'getData'])->name('topup.data');
-            Route::post('/transaksi/topup/reset-status/{id}', [App\Http\Controllers\TopupController::class, 'resetStatus'])->name('topup.reset_status');
-        });
-
-        // Tool Log Transaksi
         Route::view('/Transaksi-Topup', 'transaksi.topup.index');
         Route::prefix('transaksi-data')->group(function () {
             Route::get('/Transaksi-Topup', [App\Http\Controllers\TopupController::class, 'index'])->name('transaksi.topup.index');
-            Route::get('/Topup_transaksi/data', [App\Http\Controllers\TopupController::class, 'getData'])->name('top_transaksi.data');
+            Route::get('/Topup_transaksi/data', [App\Http\Controllers\TopupController::class, 'getData'])->name('topup_transaksi.data');
+        });
+
+        // Mutasi
+        Route::view('/Transaksi-Mutasi', 'transaksi.mutasi.index');
+        Route::prefix('transaksi-data')->group(function () {
+            Route::get('/Transaksi-Mutasi', [App\Http\Controllers\MutasiController::class, 'index'])->name('transaksi.mutasi.index');
+            Route::get('/Mutasi_transaksi/data', [App\Http\Controllers\MutasiController::class, 'getData'])->name('mutasi_transaksi.data');
+        });
+
+        // Ticket
+        Route::view('/Transaksi-Ticket', 'transaksi.ticket.index');
+        Route::prefix('transaksi-data')->group(function () {
+            Route::get('/Transaksi-Ticket', [App\Http\Controllers\TicketController::class, 'index'])->name('transaksi.ticket.index');
+            Route::get('/Ticket_transaksi/data', [App\Http\Controllers\TicketController::class, 'getData'])->name('ticket_transaksi.data');
+        });
+
+        // Inbox
+        Route::view('/Transaksi-Inbox', 'transaksi.inbox.index');
+        Route::prefix('transaksi-data')->group(function () {
+            Route::get('/Transaksi-Inbox', [App\Http\Controllers\InboxController::class, 'index'])->name('transaksi.inbox.index');
+            Route::get('/Inbox_transaksi/data', [App\Http\Controllers\InboxController::class, 'getData'])->name('inbox_transaksi.data');
+        });
+
+        // Outbox
+        Route::view('/Transaksi-Outbox', 'transaksi.outbox.index');
+        Route::prefix('transaksi-data')->group(function () {
+            Route::get('/Transaksi-Outbox', [App\Http\Controllers\OutboxController::class, 'index'])->name('transaksi.outbox.index');
+            Route::get('/Outbox_transaksi/data', [App\Http\Controllers\OutboxController::class, 'getData'])->name('outbox_transaksi.data');
         });
 
     //End Transaksi

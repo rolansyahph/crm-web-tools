@@ -44,7 +44,7 @@
         const table = $('#topupTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('topup_transaksi.data') }}",
+            ajax: "{{ route('topup.data') }}",
             columns: [
                 { data: "datetime" },
                 { data: "via" },

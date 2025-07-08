@@ -153,10 +153,10 @@ class UserController extends Controller
                     $inputUser
                 ]
             );
-
+            $userid_create = session('userid');
             $this->log_crm("Master Users - Create", json_encode([
                 'message' => 'User berhasil ditambahkan.',
-                'userid' => $request->userid,
+                'userid_create' => $userid_create,
                 'data' => $request->only(['nama', 'password', 'roleuser', 'aktif', 'mitraid'])
             ]));
 
@@ -190,9 +190,10 @@ class UserController extends Controller
             );
 
             // Log data hasil perubahan saja
+            $userid_update = session('userid');
             $this->log_crm("Master Users - Update", json_encode([
                 'message' => 'User berhasil diupdate.',
-                'userid' => $request->userid,
+                'userid_update' => $userid_update,
                 'data' => $request->only(['nama', 'password', 'roleuser', 'aktif', 'mitraid'])
             ]));
 
@@ -227,10 +228,10 @@ class UserController extends Controller
             );
 
             // Catat log ke t_log_crm
-            $userid = session('userid');
+            $userid_delete = session('userid');
             $this->log_crm("Master Users - Delete", json_encode([
                 'message' => 'User berhasil dihapus.',
-                'user delete' => $userid,
+                'userid_delete' => $userid_delete,
                 'data' => $deletedData
             ]));
 

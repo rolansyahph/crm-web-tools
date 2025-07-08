@@ -3,9 +3,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Traits\CrmLogger;
+use Illuminate\Support\Facades\Log;
 
 class TopupController extends Controller
 {
+    use CrmLogger;
+
     public function index()
     {
         return view('transaksi.topup.index');
@@ -106,6 +110,72 @@ class TopupController extends Controller
 
         $date = \DateTime::createFromFormat('Ymd His', $tglStr . ' ' . $jamStr);
         return $date ? $date->format('Y-m-d H:i:s') : null;
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            // Ambil data sebelum di-update
+            $topupData = DB::connection('mysql_dbticket')->selectOne(
+                "SELECT id, userid, jmlsetor2, trxid FROM t_topup WHERE id = ?",
+                [$request->id]
+            );
+
+            // Update status
+            DB::connection('mysql_dbticket')->update(
+                "UPDATE t_topup SET `status` = 0 WHERE id = ?",
+                [$request->id]
+            );
+
+
+            $userid = session('userid');
+
+            // Coba log ke Laravel log dulu untuk debug
+            // Log::info("Reset topup status oleh user $userid", [
+            //     'id' => $request->id,
+            //     'topup' => $topupData,
+            // ]);
+
+            // Log dengan data topup
+            $this->log_crm("Topup - Reset Status", json_encode([
+                'message' => 'Status berhasil di-reset.',
+                'userid' => $userid,
+                'data' => $topupData
+            ]));
+
+            return response()->json(['message' => 'Status berhasil di-reset.']);
+        } catch (\Exception $e) {
+            $this->log_crm("Topup - Reset Status", json_encode([
+                'message' => 'Gagal reset status.',
+                'id' => $request->id,
+                'error' => $e->getMessage()
+            ]));
+
+            return response()->json(['message' => 'Gagal Reset: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+    public function confirm_akses(Request $request)
+    {
+        try {
+            $userid = session('userid');
+            $password = $request->input('password');
+
+            $user = DB::connection('mysql_dbticket')->select(
+                "SELECT * FROM m_user WHERE userid = ? AND `password` = ? AND aktif = 1 LIMIT 1",
+                [$userid, $password]
+            );
+
+            if (count($user) === 0) {
+                return response()->json(['message' => 'Password Anda salah.'], 401);
+            }
+
+            return response()->json(['message' => 'Hak Akses Benar.']);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
     }
 
 }

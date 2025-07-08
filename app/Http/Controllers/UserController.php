@@ -216,9 +216,9 @@ class UserController extends Controller
                 [$request->userid]
             );
 
-            if (!$deletedData) {
-                return response()->json(['message' => 'User tidak ditemukan.'], 404);
-            }
+            // if (!$deletedData) {
+            //     return response()->json(['message' => 'User tidak ditemukan.'], 404);
+            // }
 
             // Lakukan penghapusan
             DB::connection('mysql_dbticket')->delete(
@@ -227,9 +227,10 @@ class UserController extends Controller
             );
 
             // Catat log ke t_log_crm
+            $userid = session('userid');
             $this->log_crm("Master Users - Delete", json_encode([
                 'message' => 'User berhasil dihapus.',
-                'userid' => $request->userid,
+                'user delete' => $userid,
                 'data' => $deletedData
             ]));
 

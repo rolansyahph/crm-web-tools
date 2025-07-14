@@ -154,28 +154,4 @@ class TopupController extends Controller
             return response()->json(['message' => 'Gagal Reset: ' . $e->getMessage()], 500);
         }
     }
-
-
-    public function confirm_akses(Request $request)
-    {
-        try {
-            $userid = session('userid');
-            $password = $request->input('password');
-
-            $user = DB::connection('mysql_dbticket')->select(
-                "SELECT * FROM m_user WHERE userid = ? AND `password` = ? AND aktif = 1 LIMIT 1",
-                [$userid, $password]
-            );
-
-            if (count($user) === 0) {
-                return response()->json(['message' => 'Password Anda salah.'], 401);
-            }
-
-            return response()->json(['message' => 'Hak Akses Benar.']);
-
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
-        }
-    }
-
 }

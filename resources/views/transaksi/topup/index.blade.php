@@ -95,10 +95,22 @@
                 { data: "status_ket" },
                 { data: "inputuser" },
                 { data: "inputtanggal" },
+                // {
+                //     data: "id",
+                //     render: function (data, type, row, meta) {
+                //         return `<button class="btn btn-sm btn-warning update-status-btn" data-id="${data}">Update Status</button>`;
+                //     },
+                //     orderable: false,
+                //     searchable: false
+                // }
                 {
                     data: "id",
                     render: function (data, type, row, meta) {
-                        return `<button class="btn btn-sm btn-warning update-status-btn" data-id="${data}">Update Status</button>`;
+                        if (row.status == 0) {
+                            return ''; // Hide the button
+                        } else {
+                            return `<button class="btn btn-sm btn-warning update-status-btn" data-id="${data}">Update Status</button>`;
+                        }
                     },
                     orderable: false,
                     searchable: false

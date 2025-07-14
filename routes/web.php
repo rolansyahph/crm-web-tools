@@ -89,7 +89,7 @@ Route::group(['middleware' => 'check.session'], function () {
             Route::get('/Transaksi-Topup', [App\Http\Controllers\TopupController::class, 'index'])->name('transaksi.topup.index');
             Route::get('/Topup_transaksi/data', [App\Http\Controllers\TopupController::class, 'getData'])->name('topup_transaksi.data');
             Route::post('topup/update-status', [App\Http\Controllers\TopupController::class, 'update'])->name('topup.update_status');
-            Route::post('topup/confirm-akses', [App\Http\Controllers\TopupController::class, 'confirm_akses'])->name('topup.confirm_akses');
+            Route::post('topup/confirm-akses', [App\Http\Controllers\UserController::class, 'confirm_akses'])->name('topup.confirm_akses');
         });
         
 
